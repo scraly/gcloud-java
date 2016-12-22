@@ -23,7 +23,7 @@ import com.google.cloud.logging.Logging.WriteOption;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
+import io.grpc.Context;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +96,9 @@ public class LoggingHandler extends Handler {
   private static final Set<String> EXCLUDED_LOGGERS = ImmutableSet.of("io.grpc", "io.netty",
       "com.google.api.client.http", "sun.net.www.protocol.http");
 
+  private static final ThreadLocal<Boolean> inPublishCall = new ThreadLocal<>();
+  private static final Context.Key<Boolean> IN_CLOUD_LOGGER_KEY = Context.<Boolean>key("inLogger");
+
   private final LoggingOptions options;
   private final List<LogEntry> buffer = new LinkedList<>();
   private final WriteOption[] writeOptions;
@@ -148,13 +151,13 @@ public class LoggingHandler extends Handler {
     String logName = firstNonNull(log, helper.getProperty(className + ".log", "java.log"));
     MonitoredResource resource = firstNonNull(monitoredResource, getDefaultResource());
     writeOptions = new WriteOption[]{WriteOption.logName(logName), WriteOption.resource(resource)};
-    maskLoggers();
+//    maskLoggers();
   }
 
   private static void maskLoggers() {
     for (String loggerName : EXCLUDED_LOGGERS) {
       Logger logger = Logger.getLogger(loggerName);
-      // We remove the Clould Logging handler if it has been registered for a logger that should be
+      // We remove the Cloud Logging handler if it has been registered for a logger that should be
       // masked
       List<LoggingHandler> loggingHandlers = getLoggingHandlers(logger);
       for (LoggingHandler loggingHandler : loggingHandlers) {
@@ -272,23 +275,62 @@ public class LoggingHandler extends Handler {
    */
   Logging getLogging() {
     if (logging == null) {
-      logging = options.getService();
+      synchronized (this) {
+        if (logging == null) {
+          logging = options.getService();
+        }
+      }
     }
     return logging;
   }
 
   @Override
-  public synchronized void publish(LogRecord record) {
-    // check that the log record should be logged
-    if (!isLoggable(record)) {
+  public void publish(LogRecord record) {
+    if (inPublishCall.get() != null) {
+      System.err.println(">>> inPublishCall (STACK) - ignoring: " + record.getMessage());
+      // ignore all logs generated in the course of logging through this handler
       return;
     }
-    LogEntry entry = entryFor(record);
-    if (entry != null) {
-      buffer.add(entry);
+    inPublishCall.set(true);
+
+    Boolean inCloudLogger = IN_CLOUD_LOGGER_KEY.get();
+    if (inCloudLogger != null) {
+      System.err.println(">>> inPublishCall (CONTEXT) - ignoring: " + record.getMessage());
+      // ignore all logs generated in the course of logging through this handler
+      return;
     }
-    if (buffer.size() >= flushSize || record.getLevel().intValue() >= flushLevel.intValue()) {
-      flush();
+
+    Context newCtx = Context.current().withValue(IN_CLOUD_LOGGER_KEY, true);
+    Context origCtx = newCtx.attach();
+
+    try {
+      // check that the log record should be logged
+      if (!isLoggable(record)) {
+        return;
+      }
+      System.err.println(">>> publishing!");
+      new Exception().printStackTrace(System.err);
+      System.err.println("--- (not a real exception)");
+      LogEntry entry = entryFor(record);
+
+      List<LogEntry> flushBuffer = null;
+      WriteOption[] flushWriteOptions = null;
+
+      synchronized (this) {
+        if (entry != null) {
+          buffer.add(entry);
+        }
+        if (buffer.size() >= flushSize || record.getLevel().intValue() >= flushLevel.intValue()) {
+          flushBuffer = buffer;
+          flushWriteOptions = writeOptions;
+          buffer.clear();
+        }
+      }
+
+      flush(flushBuffer, flushWriteOptions);
+    } finally {
+      newCtx.detach(origCtx);
+      inPublishCall.remove();
     }
   }
 
@@ -354,14 +396,31 @@ public class LoggingHandler extends Handler {
   }
 
   @Override
-  public synchronized void flush() {
+  public void flush() {
+    List<LogEntry> flushBuffer;
+    WriteOption[] flushWriteOptions;
+
+    synchronized (this) {
+      if (buffer.isEmpty()) {
+        return;
+      }
+      flushBuffer = buffer;
+      flushWriteOptions = writeOptions;
+      buffer.clear();
+    }
+
+    flush(flushBuffer, flushWriteOptions);
+  }
+
+  private void flush(List<LogEntry> flushBuffer, WriteOption[] flushWriteOptions) {
+    if (flushBuffer == null) {
+      return;
+    }
     try {
-      write(buffer, writeOptions);
+      write(flushBuffer, flushWriteOptions);
     } catch (Exception ex) {
       // writing can fail but we should not throw an exception, we report the error instead
       reportError(null, ex, ErrorManager.FLUSH_FAILURE);
-    } finally {
-      buffer.clear();
     }
   }
 
@@ -369,15 +428,23 @@ public class LoggingHandler extends Handler {
    * Closes the handler and the associated {@link Logging} object.
    */
   @Override
-  public synchronized void close() throws SecurityException {
+  public void close() throws SecurityException {
+    Logging loggingToClose = null;
     if (logging != null) {
+      synchronized (this) {
+        if (logging != null) {
+          loggingToClose = logging;
+          logging = null;
+        }
+      }
+    }
+    if (loggingToClose != null) {
       try {
-        logging.close();
+        loggingToClose.close();
       } catch (Exception ex) {
         // ignore
       }
     }
-    logging = null;
   }
 
   /**
