@@ -23,6 +23,6 @@ RUN export JAVA_HOME
 ENV APP_DIR=/usr/lib/app/
 RUN mkdir -p $APP_DIR
 WORKDIR $APP_DIR
-ADD build/libs/pubsub-dep-debug-all.jar .
+ADD build/libs/google-cloud-example-docker-gradle-all.jar .
 
 CMD ["bash"]
