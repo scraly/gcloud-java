@@ -25,4 +25,6 @@ RUN mkdir -p $APP_DIR
 WORKDIR $APP_DIR
 ADD build/libs/google-cloud-example-docker-gradle-all.jar .
 
+ADD logging.properties .
+
 CMD ["bash"]
