@@ -16,16 +16,10 @@
 package com.google.cloud.vision.v1;
 
 import com.google.api.core.BetaApi;
-import com.google.api.gax.grpc.ChannelAndExecutor;
-import com.google.api.gax.grpc.ClientContext;
-import com.google.api.gax.grpc.UnaryCallable;
-import com.google.auth.Credentials;
-import io.grpc.ManagedChannel;
-import java.io.Closeable;
+import com.google.api.gax.rpc.UnaryCallable;
+import com.google.cloud.vision.v1.stub.ImageAnnotatorStub;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Generated;
 
 // AUTO-GENERATED DOCUMENTATION AND SERVICE
@@ -83,16 +77,11 @@ import javax.annotation.Generated;
  * </code>
  * </pre>
  */
-@Generated("by GAPIC")
+@Generated("by GAPIC v0.0.5")
 @BetaApi
 public class ImageAnnotatorClient implements AutoCloseable {
   private final ImageAnnotatorSettings settings;
-  private final ScheduledExecutorService executor;
-  private final ManagedChannel channel;
-  private final List<AutoCloseable> closeables = new ArrayList<>();
-
-  private final UnaryCallable<BatchAnnotateImagesRequest, BatchAnnotateImagesResponse>
-      batchAnnotateImagesCallable;
+  private final ImageAnnotatorStub stub;
 
   /** Constructs an instance of ImageAnnotatorClient with default settings. */
   public static final ImageAnnotatorClient create() throws IOException {
@@ -109,48 +98,33 @@ public class ImageAnnotatorClient implements AutoCloseable {
   }
 
   /**
+   * Constructs an instance of ImageAnnotatorClient, using the given stub for making calls. This is
+   * for advanced usage - prefer to use ImageAnnotatorSettings}.
+   */
+  public static final ImageAnnotatorClient create(ImageAnnotatorStub stub) {
+    return new ImageAnnotatorClient(stub);
+  }
+
+  /**
    * Constructs an instance of ImageAnnotatorClient, using the given settings. This is protected so
    * that it easy to make a subclass, but otherwise, the static factory methods should be preferred.
    */
   protected ImageAnnotatorClient(ImageAnnotatorSettings settings) throws IOException {
     this.settings = settings;
-    ChannelAndExecutor channelAndExecutor = settings.getChannelAndExecutor();
-    this.executor = channelAndExecutor.getExecutor();
-    this.channel = channelAndExecutor.getChannel();
-    Credentials credentials = settings.getCredentialsProvider().getCredentials();
+    this.stub = settings.createStub();
+  }
 
-    ClientContext clientContext =
-        ClientContext.newBuilder()
-            .setExecutor(this.executor)
-            .setChannel(this.channel)
-            .setCredentials(credentials)
-            .build();
-
-    this.batchAnnotateImagesCallable =
-        UnaryCallable.create(settings.batchAnnotateImagesSettings(), clientContext);
-
-    if (settings.getChannelProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              channel.shutdown();
-            }
-          });
-    }
-    if (settings.getExecutorProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              executor.shutdown();
-            }
-          });
-    }
+  protected ImageAnnotatorClient(ImageAnnotatorStub stub) {
+    this.settings = null;
+    this.stub = stub;
   }
 
   public final ImageAnnotatorSettings getSettings() {
     return settings;
+  }
+
+  public ImageAnnotatorStub getStub() {
+    return stub;
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -221,7 +195,7 @@ public class ImageAnnotatorClient implements AutoCloseable {
    */
   public final UnaryCallable<BatchAnnotateImagesRequest, BatchAnnotateImagesResponse>
       batchAnnotateImagesCallable() {
-    return batchAnnotateImagesCallable;
+    return stub.batchAnnotateImagesCallable();
   }
 
   /**
@@ -230,8 +204,6 @@ public class ImageAnnotatorClient implements AutoCloseable {
    */
   @Override
   public final void close() throws Exception {
-    for (AutoCloseable closeable : closeables) {
-      closeable.close();
-    }
+    stub.close();
   }
 }

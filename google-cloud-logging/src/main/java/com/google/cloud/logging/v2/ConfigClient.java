@@ -18,10 +18,8 @@ package com.google.cloud.logging.v2;
 import static com.google.cloud.logging.v2.PagedResponseWrappers.ListSinksPagedResponse;
 
 import com.google.api.core.BetaApi;
-import com.google.api.gax.grpc.ChannelAndExecutor;
-import com.google.api.gax.grpc.ClientContext;
-import com.google.api.gax.grpc.UnaryCallable;
-import com.google.auth.Credentials;
+import com.google.api.gax.rpc.UnaryCallable;
+import com.google.cloud.logging.v2.stub.ConfigServiceV2Stub;
 import com.google.logging.v2.CreateSinkRequest;
 import com.google.logging.v2.DeleteSinkRequest;
 import com.google.logging.v2.GetSinkRequest;
@@ -32,12 +30,7 @@ import com.google.logging.v2.ParentNameOneof;
 import com.google.logging.v2.SinkNameOneof;
 import com.google.logging.v2.UpdateSinkRequest;
 import com.google.protobuf.Empty;
-import io.grpc.ManagedChannel;
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Generated;
 
 // AUTO-GENERATED DOCUMENTATION AND SERVICE
@@ -94,20 +87,11 @@ import javax.annotation.Generated;
  * </code>
  * </pre>
  */
-@Generated("by GAPIC")
+@Generated("by GAPIC v0.0.5")
 @BetaApi
 public class ConfigClient implements AutoCloseable {
   private final ConfigSettings settings;
-  private final ScheduledExecutorService executor;
-  private final ManagedChannel channel;
-  private final List<AutoCloseable> closeables = new ArrayList<>();
-
-  private final UnaryCallable<ListSinksRequest, ListSinksResponse> listSinksCallable;
-  private final UnaryCallable<ListSinksRequest, ListSinksPagedResponse> listSinksPagedCallable;
-  private final UnaryCallable<GetSinkRequest, LogSink> getSinkCallable;
-  private final UnaryCallable<CreateSinkRequest, LogSink> createSinkCallable;
-  private final UnaryCallable<UpdateSinkRequest, LogSink> updateSinkCallable;
-  private final UnaryCallable<DeleteSinkRequest, Empty> deleteSinkCallable;
+  private final ConfigServiceV2Stub stub;
 
   /** Constructs an instance of ConfigClient with default settings. */
   public static final ConfigClient create() throws IOException {
@@ -123,53 +107,33 @@ public class ConfigClient implements AutoCloseable {
   }
 
   /**
+   * Constructs an instance of ConfigClient, using the given stub for making calls. This is for
+   * advanced usage - prefer to use ConfigSettings}.
+   */
+  public static final ConfigClient create(ConfigServiceV2Stub stub) {
+    return new ConfigClient(stub);
+  }
+
+  /**
    * Constructs an instance of ConfigClient, using the given settings. This is protected so that it
    * easy to make a subclass, but otherwise, the static factory methods should be preferred.
    */
   protected ConfigClient(ConfigSettings settings) throws IOException {
     this.settings = settings;
-    ChannelAndExecutor channelAndExecutor = settings.getChannelAndExecutor();
-    this.executor = channelAndExecutor.getExecutor();
-    this.channel = channelAndExecutor.getChannel();
-    Credentials credentials = settings.getCredentialsProvider().getCredentials();
+    this.stub = settings.createStub();
+  }
 
-    ClientContext clientContext =
-        ClientContext.newBuilder()
-            .setExecutor(this.executor)
-            .setChannel(this.channel)
-            .setCredentials(credentials)
-            .build();
-
-    this.listSinksCallable = UnaryCallable.create(settings.listSinksSettings(), clientContext);
-    this.listSinksPagedCallable =
-        UnaryCallable.createPagedVariant(settings.listSinksSettings(), clientContext);
-    this.getSinkCallable = UnaryCallable.create(settings.getSinkSettings(), clientContext);
-    this.createSinkCallable = UnaryCallable.create(settings.createSinkSettings(), clientContext);
-    this.updateSinkCallable = UnaryCallable.create(settings.updateSinkSettings(), clientContext);
-    this.deleteSinkCallable = UnaryCallable.create(settings.deleteSinkSettings(), clientContext);
-
-    if (settings.getChannelProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              channel.shutdown();
-            }
-          });
-    }
-    if (settings.getExecutorProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              executor.shutdown();
-            }
-          });
-    }
+  protected ConfigClient(ConfigServiceV2Stub stub) {
+    this.settings = null;
+    this.stub = stub;
   }
 
   public final ConfigSettings getSettings() {
     return settings;
+  }
+
+  public ConfigServiceV2Stub getStub() {
+    return stub;
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -244,7 +208,7 @@ public class ConfigClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<ListSinksRequest, ListSinksPagedResponse> listSinksPagedCallable() {
-    return listSinksPagedCallable;
+    return stub.listSinksPagedCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -275,7 +239,7 @@ public class ConfigClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<ListSinksRequest, ListSinksResponse> listSinksCallable() {
-    return listSinksCallable;
+    return stub.listSinksCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -348,7 +312,7 @@ public class ConfigClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<GetSinkRequest, LogSink> getSinkCallable() {
-    return getSinkCallable;
+    return stub.getSinkCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -435,7 +399,7 @@ public class ConfigClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<CreateSinkRequest, LogSink> createSinkCallable() {
-    return createSinkCallable;
+    return stub.createSinkCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -531,7 +495,7 @@ public class ConfigClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<UpdateSinkRequest, LogSink> updateSinkCallable() {
-    return updateSinkCallable;
+    return stub.updateSinkCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -608,7 +572,7 @@ public class ConfigClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<DeleteSinkRequest, Empty> deleteSinkCallable() {
-    return deleteSinkCallable;
+    return stub.deleteSinkCallable();
   }
 
   /**
@@ -617,8 +581,6 @@ public class ConfigClient implements AutoCloseable {
    */
   @Override
   public final void close() throws Exception {
-    for (AutoCloseable closeable : closeables) {
-      closeable.close();
-    }
+    stub.close();
   }
 }

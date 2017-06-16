@@ -16,24 +16,14 @@
 package com.google.cloud.videointelligence.v1beta1;
 
 import com.google.api.core.BetaApi;
-import com.google.api.gax.core.FixedCredentialsProvider;
-import com.google.api.gax.grpc.ChannelAndExecutor;
-import com.google.api.gax.grpc.ClientContext;
-import com.google.api.gax.grpc.FixedChannelProvider;
-import com.google.api.gax.grpc.FixedExecutorProvider;
-import com.google.api.gax.grpc.OperationCallable;
-import com.google.api.gax.grpc.OperationFuture;
-import com.google.api.gax.grpc.UnaryCallable;
-import com.google.auth.Credentials;
+import com.google.api.gax.rpc.OperationCallable;
+import com.google.api.gax.rpc.OperationFuture;
+import com.google.api.gax.rpc.UnaryCallable;
+import com.google.cloud.videointelligence.v1beta1.stub.VideoIntelligenceServiceStub;
 import com.google.longrunning.Operation;
 import com.google.longrunning.OperationsClient;
-import com.google.longrunning.OperationsSettings;
-import io.grpc.ManagedChannel;
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Generated;
 
 // AUTO-GENERATED DOCUMENTATION AND SERVICE
@@ -94,18 +84,12 @@ import javax.annotation.Generated;
  * </code>
  * </pre>
  */
-@Generated("by GAPIC")
+@Generated("by GAPIC v0.0.5")
 @BetaApi
 public class VideoIntelligenceServiceClient implements AutoCloseable {
   private final VideoIntelligenceServiceSettings settings;
-  private final ScheduledExecutorService executor;
-  private final ManagedChannel channel;
+  private final VideoIntelligenceServiceStub stub;
   private final OperationsClient operationsClient;
-  private final List<AutoCloseable> closeables = new ArrayList<>();
-
-  private final UnaryCallable<AnnotateVideoRequest, Operation> annotateVideoCallable;
-  private final OperationCallable<AnnotateVideoRequest, AnnotateVideoResponse>
-      annotateVideoOperationCallable;
 
   /** Constructs an instance of VideoIntelligenceServiceClient with default settings. */
   public static final VideoIntelligenceServiceClient create() throws IOException {
@@ -123,6 +107,14 @@ public class VideoIntelligenceServiceClient implements AutoCloseable {
   }
 
   /**
+   * Constructs an instance of VideoIntelligenceServiceClient, using the given stub for making
+   * calls. This is for advanced usage - prefer to use VideoIntelligenceServiceSettings}.
+   */
+  public static final VideoIntelligenceServiceClient create(VideoIntelligenceServiceStub stub) {
+    return new VideoIntelligenceServiceClient(stub);
+  }
+
+  /**
    * Constructs an instance of VideoIntelligenceServiceClient, using the given settings. This is
    * protected so that it easy to make a subclass, but otherwise, the static factory methods should
    * be preferred.
@@ -130,55 +122,22 @@ public class VideoIntelligenceServiceClient implements AutoCloseable {
   protected VideoIntelligenceServiceClient(VideoIntelligenceServiceSettings settings)
       throws IOException {
     this.settings = settings;
-    ChannelAndExecutor channelAndExecutor = settings.getChannelAndExecutor();
-    this.executor = channelAndExecutor.getExecutor();
-    this.channel = channelAndExecutor.getChannel();
-    Credentials credentials = settings.getCredentialsProvider().getCredentials();
+    this.stub = settings.createStub();
+    this.operationsClient = OperationsClient.create(this.stub.getOperationsStub());
+  }
 
-    ClientContext clientContext =
-        ClientContext.newBuilder()
-            .setExecutor(this.executor)
-            .setChannel(this.channel)
-            .setCredentials(credentials)
-            .build();
-
-    OperationsSettings operationsSettings =
-        OperationsSettings.defaultBuilder()
-            .setExecutorProvider(FixedExecutorProvider.create(this.executor))
-            .setChannelProvider(FixedChannelProvider.create(this.channel))
-            .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
-            .build();
-    this.operationsClient = OperationsClient.create(operationsSettings);
-
-    this.annotateVideoCallable =
-        UnaryCallable.create(
-            settings.annotateVideoSettings().getInitialCallSettings(), clientContext);
-    this.annotateVideoOperationCallable =
-        OperationCallable.create(
-            settings.annotateVideoSettings(), clientContext, this.operationsClient);
-
-    if (settings.getChannelProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              channel.shutdown();
-            }
-          });
-    }
-    if (settings.getExecutorProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              executor.shutdown();
-            }
-          });
-    }
+  protected VideoIntelligenceServiceClient(VideoIntelligenceServiceStub stub) {
+    this.settings = null;
+    this.stub = stub;
+    this.operationsClient = OperationsClient.create(this.stub.getOperationsStub());
   }
 
   public final VideoIntelligenceServiceSettings getSettings() {
     return settings;
+  }
+
+  public VideoIntelligenceServiceStub getStub() {
+    return stub;
   }
 
   /**
@@ -230,7 +189,7 @@ public class VideoIntelligenceServiceClient implements AutoCloseable {
    *     region will be determined based on video file location.
    * @throws com.google.api.gax.grpc.ApiException if the remote call fails
    */
-  public final OperationFuture<AnnotateVideoResponse> annotateVideoAsync(
+  public final OperationFuture<AnnotateVideoResponse, Operation> annotateVideoAsync(
       String inputUri,
       List<Feature> features,
       VideoContext videoContext,
@@ -272,7 +231,7 @@ public class VideoIntelligenceServiceClient implements AutoCloseable {
    * @param request The request object containing all of the parameters for the API call.
    * @throws com.google.api.gax.grpc.ApiException if the remote call fails
    */
-  public final OperationFuture<AnnotateVideoResponse> annotateVideoAsync(
+  public final OperationFuture<AnnotateVideoResponse, Operation> annotateVideoAsync(
       AnnotateVideoRequest request) {
     return annotateVideoOperationCallable().futureCall(request);
   }
@@ -300,9 +259,9 @@ public class VideoIntelligenceServiceClient implements AutoCloseable {
    * }
    * </code></pre>
    */
-  public final OperationCallable<AnnotateVideoRequest, AnnotateVideoResponse>
+  public final OperationCallable<AnnotateVideoRequest, AnnotateVideoResponse, Operation>
       annotateVideoOperationCallable() {
-    return annotateVideoOperationCallable;
+    return stub.annotateVideoOperationCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -329,7 +288,7 @@ public class VideoIntelligenceServiceClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<AnnotateVideoRequest, Operation> annotateVideoCallable() {
-    return annotateVideoCallable;
+    return stub.annotateVideoCallable();
   }
 
   /**
@@ -338,8 +297,6 @@ public class VideoIntelligenceServiceClient implements AutoCloseable {
    */
   @Override
   public final void close() throws Exception {
-    for (AutoCloseable closeable : closeables) {
-      closeable.close();
-    }
+    stub.close();
   }
 }

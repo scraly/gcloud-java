@@ -20,7 +20,8 @@ import static com.google.cloud.logging.v2.PagedResponseWrappers.ListLogsPagedRes
 
 import com.google.api.MonitoredResource;
 import com.google.api.gax.core.NoCredentialsProvider;
-import com.google.api.gax.grpc.ApiException;
+import com.google.api.gax.grpc.GrpcApiException;
+import com.google.api.gax.grpc.GrpcTransportSettings;
 import com.google.api.gax.grpc.testing.MockGrpcService;
 import com.google.api.gax.grpc.testing.MockServiceHelper;
 import com.google.common.collect.Lists;
@@ -84,7 +85,10 @@ public class LoggingClientTest {
     serviceHelper.reset();
     LoggingSettings settings =
         LoggingSettings.defaultBuilder()
-            .setChannelProvider(serviceHelper.createChannelProvider())
+            .setTransportSettings(
+                GrpcTransportSettings.newBuilder()
+                    .setChannelProvider(serviceHelper.createChannelProvider())
+                    .build())
             .setCredentialsProvider(new NoCredentialsProvider())
             .build();
     client = LoggingClient.create(settings);
@@ -123,7 +127,7 @@ public class LoggingClientTest {
 
       client.deleteLog(logName);
       Assert.fail("No exception raised");
-    } catch (ApiException e) {
+    } catch (GrpcApiException e) {
       Assert.assertEquals(Status.INVALID_ARGUMENT.getCode(), e.getStatusCode());
     }
   }
@@ -167,7 +171,7 @@ public class LoggingClientTest {
 
       client.writeLogEntries(logName, resource, labels, entries);
       Assert.fail("No exception raised");
-    } catch (ApiException e) {
+    } catch (GrpcApiException e) {
       Assert.assertEquals(Status.INVALID_ARGUMENT.getCode(), e.getStatusCode());
     }
   }
@@ -218,7 +222,7 @@ public class LoggingClientTest {
 
       client.listLogEntries(resourceNames, filter, orderBy);
       Assert.fail("No exception raised");
-    } catch (ApiException e) {
+    } catch (GrpcApiException e) {
       Assert.assertEquals(Status.INVALID_ARGUMENT.getCode(), e.getStatusCode());
     }
   }
@@ -262,7 +266,7 @@ public class LoggingClientTest {
 
       client.listLogs(parent);
       Assert.fail("No exception raised");
-    } catch (ApiException e) {
+    } catch (GrpcApiException e) {
       Assert.assertEquals(Status.INVALID_ARGUMENT.getCode(), e.getStatusCode());
     }
   }

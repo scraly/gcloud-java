@@ -18,8 +18,9 @@ package com.google.cloud.errorreporting.v1beta1;
 import static com.google.cloud.errorreporting.v1beta1.PagedResponseWrappers.ListEventsPagedResponse;
 import static com.google.cloud.errorreporting.v1beta1.PagedResponseWrappers.ListGroupStatsPagedResponse;
 
-import com.google.api.gax.grpc.ChannelAndExecutor;
-import com.google.api.gax.grpc.UnaryCallable;
+import com.google.api.core.BetaApi;
+import com.google.api.gax.rpc.UnaryCallable;
+import com.google.cloud.errorreporting.v1beta1.stub.ErrorStatsServiceStub;
 import com.google.devtools.clouderrorreporting.v1beta1.DeleteEventsRequest;
 import com.google.devtools.clouderrorreporting.v1beta1.DeleteEventsResponse;
 import com.google.devtools.clouderrorreporting.v1beta1.ListEventsRequest;
@@ -28,13 +29,7 @@ import com.google.devtools.clouderrorreporting.v1beta1.ListGroupStatsRequest;
 import com.google.devtools.clouderrorreporting.v1beta1.ListGroupStatsResponse;
 import com.google.devtools.clouderrorreporting.v1beta1.ProjectName;
 import com.google.devtools.clouderrorreporting.v1beta1.QueryTimeRange;
-import com.google.protobuf.ExperimentalApi;
-import io.grpc.ManagedChannel;
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Generated;
 
 // AUTO-GENERATED DOCUMENTATION AND SERVICE
@@ -83,31 +78,20 @@ import javax.annotation.Generated;
  *
  * <pre>
  * <code>
- * InstantiatingChannelProvider channelProvider =
- *     ErrorStatsServiceSettings.defaultChannelProviderBuilder()
+ * ErrorStatsServiceSettings errorStatsServiceSettings =
+ *     ErrorStatsServiceSettings.defaultBuilder()
  *         .setCredentialsProvider(FixedCredentialsProvider.create(myCredentials))
  *         .build();
- * ErrorStatsServiceSettings errorStatsServiceSettings =
- *     ErrorStatsServiceSettings.defaultBuilder().setChannelProvider(channelProvider).build();
  * ErrorStatsServiceClient errorStatsServiceClient =
  *     ErrorStatsServiceClient.create(errorStatsServiceSettings);
  * </code>
  * </pre>
  */
-@Generated("by GAPIC")
-@ExperimentalApi
+@Generated("by GAPIC v0.0.5")
+@BetaApi
 public class ErrorStatsServiceClient implements AutoCloseable {
   private final ErrorStatsServiceSettings settings;
-  private final ScheduledExecutorService executor;
-  private final ManagedChannel channel;
-  private final List<AutoCloseable> closeables = new ArrayList<>();
-
-  private final UnaryCallable<ListGroupStatsRequest, ListGroupStatsResponse> listGroupStatsCallable;
-  private final UnaryCallable<ListGroupStatsRequest, ListGroupStatsPagedResponse>
-      listGroupStatsPagedCallable;
-  private final UnaryCallable<ListEventsRequest, ListEventsResponse> listEventsCallable;
-  private final UnaryCallable<ListEventsRequest, ListEventsPagedResponse> listEventsPagedCallable;
-  private final UnaryCallable<DeleteEventsRequest, DeleteEventsResponse> deleteEventsCallable;
+  private final ErrorStatsServiceStub stub;
 
   /** Constructs an instance of ErrorStatsServiceClient with default settings. */
   public static final ErrorStatsServiceClient create() throws IOException {
@@ -124,51 +108,34 @@ public class ErrorStatsServiceClient implements AutoCloseable {
   }
 
   /**
+   * Constructs an instance of ErrorStatsServiceClient, using the given stub for making calls. This
+   * is for advanced usage - prefer to use ErrorStatsServiceSettings}.
+   */
+  public static final ErrorStatsServiceClient create(ErrorStatsServiceStub stub) {
+    return new ErrorStatsServiceClient(stub);
+  }
+
+  /**
    * Constructs an instance of ErrorStatsServiceClient, using the given settings. This is protected
    * so that it easy to make a subclass, but otherwise, the static factory methods should be
    * preferred.
    */
   protected ErrorStatsServiceClient(ErrorStatsServiceSettings settings) throws IOException {
     this.settings = settings;
-    ChannelAndExecutor channelAndExecutor = settings.getChannelAndExecutor();
-    this.executor = channelAndExecutor.getExecutor();
-    this.channel = channelAndExecutor.getChannel();
+    this.stub = settings.createStub();
+  }
 
-    this.listGroupStatsCallable =
-        UnaryCallable.create(settings.listGroupStatsSettings(), this.channel, this.executor);
-    this.listGroupStatsPagedCallable =
-        UnaryCallable.createPagedVariant(
-            settings.listGroupStatsSettings(), this.channel, this.executor);
-    this.listEventsCallable =
-        UnaryCallable.create(settings.listEventsSettings(), this.channel, this.executor);
-    this.listEventsPagedCallable =
-        UnaryCallable.createPagedVariant(
-            settings.listEventsSettings(), this.channel, this.executor);
-    this.deleteEventsCallable =
-        UnaryCallable.create(settings.deleteEventsSettings(), this.channel, this.executor);
-
-    if (settings.getChannelProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              channel.shutdown();
-            }
-          });
-    }
-    if (settings.getExecutorProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              executor.shutdown();
-            }
-          });
-    }
+  protected ErrorStatsServiceClient(ErrorStatsServiceStub stub) {
+    this.settings = null;
+    this.stub = stub;
   }
 
   public final ErrorStatsServiceSettings getSettings() {
     return settings;
+  }
+
+  public ErrorStatsServiceStub getStub() {
+    return stub;
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -261,7 +228,7 @@ public class ErrorStatsServiceClient implements AutoCloseable {
    */
   public final UnaryCallable<ListGroupStatsRequest, ListGroupStatsPagedResponse>
       listGroupStatsPagedCallable() {
-    return listGroupStatsPagedCallable;
+    return stub.listGroupStatsPagedCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -295,7 +262,7 @@ public class ErrorStatsServiceClient implements AutoCloseable {
    */
   public final UnaryCallable<ListGroupStatsRequest, ListGroupStatsResponse>
       listGroupStatsCallable() {
-    return listGroupStatsCallable;
+    return stub.listGroupStatsCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -379,7 +346,7 @@ public class ErrorStatsServiceClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<ListEventsRequest, ListEventsPagedResponse> listEventsPagedCallable() {
-    return listEventsPagedCallable;
+    return stub.listEventsPagedCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -412,7 +379,7 @@ public class ErrorStatsServiceClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<ListEventsRequest, ListEventsResponse> listEventsCallable() {
-    return listEventsCallable;
+    return stub.listEventsCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -482,7 +449,7 @@ public class ErrorStatsServiceClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<DeleteEventsRequest, DeleteEventsResponse> deleteEventsCallable() {
-    return deleteEventsCallable;
+    return stub.deleteEventsCallable();
   }
 
   /**
@@ -491,8 +458,6 @@ public class ErrorStatsServiceClient implements AutoCloseable {
    */
   @Override
   public final void close() throws Exception {
-    for (AutoCloseable closeable : closeables) {
-      closeable.close();
-    }
+    stub.close();
   }
 }

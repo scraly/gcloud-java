@@ -19,10 +19,8 @@ import static com.google.cloud.pubsub.v1.PagedResponseWrappers.ListTopicSubscrip
 import static com.google.cloud.pubsub.v1.PagedResponseWrappers.ListTopicsPagedResponse;
 
 import com.google.api.core.BetaApi;
-import com.google.api.gax.grpc.ChannelAndExecutor;
-import com.google.api.gax.grpc.ClientContext;
-import com.google.api.gax.grpc.UnaryCallable;
-import com.google.auth.Credentials;
+import com.google.api.gax.rpc.UnaryCallable;
+import com.google.cloud.pubsub.v1.stub.PublisherStub;
 import com.google.iam.v1.GetIamPolicyRequest;
 import com.google.iam.v1.Policy;
 import com.google.iam.v1.SetIamPolicyRequest;
@@ -41,12 +39,8 @@ import com.google.pubsub.v1.PublishResponse;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.Topic;
 import com.google.pubsub.v1.TopicName;
-import io.grpc.ManagedChannel;
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Generated;
 
 // AUTO-GENERATED DOCUMENTATION AND SERVICE
@@ -105,28 +99,11 @@ import javax.annotation.Generated;
  * </code>
  * </pre>
  */
-@Generated("by GAPIC")
+@Generated("by GAPIC v0.0.5")
 @BetaApi
 public class TopicAdminClient implements AutoCloseable {
   private final TopicAdminSettings settings;
-  private final ScheduledExecutorService executor;
-  private final ManagedChannel channel;
-  private final List<AutoCloseable> closeables = new ArrayList<>();
-
-  private final UnaryCallable<Topic, Topic> createTopicCallable;
-  private final UnaryCallable<PublishRequest, PublishResponse> publishCallable;
-  private final UnaryCallable<GetTopicRequest, Topic> getTopicCallable;
-  private final UnaryCallable<ListTopicsRequest, ListTopicsResponse> listTopicsCallable;
-  private final UnaryCallable<ListTopicsRequest, ListTopicsPagedResponse> listTopicsPagedCallable;
-  private final UnaryCallable<ListTopicSubscriptionsRequest, ListTopicSubscriptionsResponse>
-      listTopicSubscriptionsCallable;
-  private final UnaryCallable<ListTopicSubscriptionsRequest, ListTopicSubscriptionsPagedResponse>
-      listTopicSubscriptionsPagedCallable;
-  private final UnaryCallable<DeleteTopicRequest, Empty> deleteTopicCallable;
-  private final UnaryCallable<SetIamPolicyRequest, Policy> setIamPolicyCallable;
-  private final UnaryCallable<GetIamPolicyRequest, Policy> getIamPolicyCallable;
-  private final UnaryCallable<TestIamPermissionsRequest, TestIamPermissionsResponse>
-      testIamPermissionsCallable;
+  private final PublisherStub stub;
 
   /** Constructs an instance of TopicAdminClient with default settings. */
   public static final TopicAdminClient create() throws IOException {
@@ -142,63 +119,33 @@ public class TopicAdminClient implements AutoCloseable {
   }
 
   /**
+   * Constructs an instance of TopicAdminClient, using the given stub for making calls. This is for
+   * advanced usage - prefer to use TopicAdminSettings}.
+   */
+  public static final TopicAdminClient create(PublisherStub stub) {
+    return new TopicAdminClient(stub);
+  }
+
+  /**
    * Constructs an instance of TopicAdminClient, using the given settings. This is protected so that
    * it easy to make a subclass, but otherwise, the static factory methods should be preferred.
    */
   protected TopicAdminClient(TopicAdminSettings settings) throws IOException {
     this.settings = settings;
-    ChannelAndExecutor channelAndExecutor = settings.getChannelAndExecutor();
-    this.executor = channelAndExecutor.getExecutor();
-    this.channel = channelAndExecutor.getChannel();
-    Credentials credentials = settings.getCredentialsProvider().getCredentials();
+    this.stub = settings.createStub();
+  }
 
-    ClientContext clientContext =
-        ClientContext.newBuilder()
-            .setExecutor(this.executor)
-            .setChannel(this.channel)
-            .setCredentials(credentials)
-            .build();
-
-    this.createTopicCallable = UnaryCallable.create(settings.createTopicSettings(), clientContext);
-    this.publishCallable = UnaryCallable.create(settings.publishSettings(), clientContext);
-    this.getTopicCallable = UnaryCallable.create(settings.getTopicSettings(), clientContext);
-    this.listTopicsCallable = UnaryCallable.create(settings.listTopicsSettings(), clientContext);
-    this.listTopicsPagedCallable =
-        UnaryCallable.createPagedVariant(settings.listTopicsSettings(), clientContext);
-    this.listTopicSubscriptionsCallable =
-        UnaryCallable.create(settings.listTopicSubscriptionsSettings(), clientContext);
-    this.listTopicSubscriptionsPagedCallable =
-        UnaryCallable.createPagedVariant(settings.listTopicSubscriptionsSettings(), clientContext);
-    this.deleteTopicCallable = UnaryCallable.create(settings.deleteTopicSettings(), clientContext);
-    this.setIamPolicyCallable =
-        UnaryCallable.create(settings.setIamPolicySettings(), clientContext);
-    this.getIamPolicyCallable =
-        UnaryCallable.create(settings.getIamPolicySettings(), clientContext);
-    this.testIamPermissionsCallable =
-        UnaryCallable.create(settings.testIamPermissionsSettings(), clientContext);
-
-    if (settings.getChannelProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              channel.shutdown();
-            }
-          });
-    }
-    if (settings.getExecutorProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              executor.shutdown();
-            }
-          });
-    }
+  protected TopicAdminClient(PublisherStub stub) {
+    this.settings = null;
+    this.stub = stub;
   }
 
   public final TopicAdminSettings getSettings() {
     return settings;
+  }
+
+  public PublisherStub getStub() {
+    return stub;
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -269,7 +216,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<Topic, Topic> createTopicCallable() {
-    return createTopicCallable;
+    return stub.createTopicCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -363,7 +310,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   /* package-private */ final UnaryCallable<PublishRequest, PublishResponse> publishCallable() {
-    return publishCallable;
+    return stub.publishCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -430,7 +377,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<GetTopicRequest, Topic> getTopicCallable() {
-    return getTopicCallable;
+    return stub.getTopicCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -504,7 +451,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<ListTopicsRequest, ListTopicsPagedResponse> listTopicsPagedCallable() {
-    return listTopicsPagedCallable;
+    return stub.listTopicsPagedCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -535,7 +482,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<ListTopicsRequest, ListTopicsResponse> listTopicsCallable() {
-    return listTopicsCallable;
+    return stub.listTopicsCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -611,7 +558,7 @@ public class TopicAdminClient implements AutoCloseable {
    */
   public final UnaryCallable<ListTopicSubscriptionsRequest, ListTopicSubscriptionsPagedResponse>
       listTopicSubscriptionsPagedCallable() {
-    return listTopicSubscriptionsPagedCallable;
+    return stub.listTopicSubscriptionsPagedCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -643,7 +590,7 @@ public class TopicAdminClient implements AutoCloseable {
    */
   public final UnaryCallable<ListTopicSubscriptionsRequest, ListTopicSubscriptionsResponse>
       listTopicSubscriptionsCallable() {
-    return listTopicSubscriptionsCallable;
+    return stub.listTopicSubscriptionsCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -720,7 +667,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<DeleteTopicRequest, Empty> deleteTopicCallable() {
-    return deleteTopicCallable;
+    return stub.deleteTopicCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -798,7 +745,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<SetIamPolicyRequest, Policy> setIamPolicyCallable() {
-    return setIamPolicyCallable;
+    return stub.setIamPolicyCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -870,7 +817,7 @@ public class TopicAdminClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<GetIamPolicyRequest, Policy> getIamPolicyCallable() {
-    return getIamPolicyCallable;
+    return stub.getIamPolicyCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -956,7 +903,7 @@ public class TopicAdminClient implements AutoCloseable {
    */
   public final UnaryCallable<TestIamPermissionsRequest, TestIamPermissionsResponse>
       testIamPermissionsCallable() {
-    return testIamPermissionsCallable;
+    return stub.testIamPermissionsCallable();
   }
 
   /**
@@ -965,8 +912,6 @@ public class TopicAdminClient implements AutoCloseable {
    */
   @Override
   public final void close() throws Exception {
-    for (AutoCloseable closeable : closeables) {
-      closeable.close();
-    }
+    stub.close();
   }
 }

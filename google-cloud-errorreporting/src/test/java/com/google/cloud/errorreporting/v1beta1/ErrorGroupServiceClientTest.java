@@ -15,7 +15,9 @@
  */
 package com.google.cloud.errorreporting.v1beta1;
 
-import com.google.api.gax.grpc.ApiException;
+import com.google.api.gax.core.NoCredentialsProvider;
+import com.google.api.gax.grpc.GrpcApiException;
+import com.google.api.gax.grpc.GrpcTransportSettings;
 import com.google.api.gax.grpc.testing.MockGrpcService;
 import com.google.api.gax.grpc.testing.MockServiceHelper;
 import com.google.devtools.clouderrorreporting.v1beta1.ErrorGroup;
@@ -66,7 +68,11 @@ public class ErrorGroupServiceClientTest {
     serviceHelper.reset();
     ErrorGroupServiceSettings settings =
         ErrorGroupServiceSettings.defaultBuilder()
-            .setChannelProvider(serviceHelper.createChannelProvider())
+            .setTransportSettings(
+                GrpcTransportSettings.newBuilder()
+                    .setChannelProvider(serviceHelper.createChannelProvider())
+                    .build())
+            .setCredentialsProvider(new NoCredentialsProvider())
             .build();
     client = ErrorGroupServiceClient.create(settings);
   }
@@ -108,7 +114,7 @@ public class ErrorGroupServiceClientTest {
 
       client.getGroup(groupName);
       Assert.fail("No exception raised");
-    } catch (ApiException e) {
+    } catch (GrpcApiException e) {
       Assert.assertEquals(Status.INVALID_ARGUMENT.getCode(), e.getStatusCode());
     }
   }
@@ -145,7 +151,7 @@ public class ErrorGroupServiceClientTest {
 
       client.updateGroup(group);
       Assert.fail("No exception raised");
-    } catch (ApiException e) {
+    } catch (GrpcApiException e) {
       Assert.assertEquals(Status.INVALID_ARGUMENT.getCode(), e.getStatusCode());
     }
   }

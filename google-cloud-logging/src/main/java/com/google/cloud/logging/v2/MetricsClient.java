@@ -18,10 +18,8 @@ package com.google.cloud.logging.v2;
 import static com.google.cloud.logging.v2.PagedResponseWrappers.ListLogMetricsPagedResponse;
 
 import com.google.api.core.BetaApi;
-import com.google.api.gax.grpc.ChannelAndExecutor;
-import com.google.api.gax.grpc.ClientContext;
-import com.google.api.gax.grpc.UnaryCallable;
-import com.google.auth.Credentials;
+import com.google.api.gax.rpc.UnaryCallable;
+import com.google.cloud.logging.v2.stub.MetricsServiceV2Stub;
 import com.google.logging.v2.CreateLogMetricRequest;
 import com.google.logging.v2.DeleteLogMetricRequest;
 import com.google.logging.v2.GetLogMetricRequest;
@@ -32,12 +30,7 @@ import com.google.logging.v2.MetricNameOneof;
 import com.google.logging.v2.ParentNameOneof;
 import com.google.logging.v2.UpdateLogMetricRequest;
 import com.google.protobuf.Empty;
-import io.grpc.ManagedChannel;
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Generated;
 
 // AUTO-GENERATED DOCUMENTATION AND SERVICE
@@ -93,21 +86,11 @@ import javax.annotation.Generated;
  * </code>
  * </pre>
  */
-@Generated("by GAPIC")
+@Generated("by GAPIC v0.0.5")
 @BetaApi
 public class MetricsClient implements AutoCloseable {
   private final MetricsSettings settings;
-  private final ScheduledExecutorService executor;
-  private final ManagedChannel channel;
-  private final List<AutoCloseable> closeables = new ArrayList<>();
-
-  private final UnaryCallable<ListLogMetricsRequest, ListLogMetricsResponse> listLogMetricsCallable;
-  private final UnaryCallable<ListLogMetricsRequest, ListLogMetricsPagedResponse>
-      listLogMetricsPagedCallable;
-  private final UnaryCallable<GetLogMetricRequest, LogMetric> getLogMetricCallable;
-  private final UnaryCallable<CreateLogMetricRequest, LogMetric> createLogMetricCallable;
-  private final UnaryCallable<UpdateLogMetricRequest, LogMetric> updateLogMetricCallable;
-  private final UnaryCallable<DeleteLogMetricRequest, Empty> deleteLogMetricCallable;
+  private final MetricsServiceV2Stub stub;
 
   /** Constructs an instance of MetricsClient with default settings. */
   public static final MetricsClient create() throws IOException {
@@ -123,58 +106,33 @@ public class MetricsClient implements AutoCloseable {
   }
 
   /**
+   * Constructs an instance of MetricsClient, using the given stub for making calls. This is for
+   * advanced usage - prefer to use MetricsSettings}.
+   */
+  public static final MetricsClient create(MetricsServiceV2Stub stub) {
+    return new MetricsClient(stub);
+  }
+
+  /**
    * Constructs an instance of MetricsClient, using the given settings. This is protected so that it
    * easy to make a subclass, but otherwise, the static factory methods should be preferred.
    */
   protected MetricsClient(MetricsSettings settings) throws IOException {
     this.settings = settings;
-    ChannelAndExecutor channelAndExecutor = settings.getChannelAndExecutor();
-    this.executor = channelAndExecutor.getExecutor();
-    this.channel = channelAndExecutor.getChannel();
-    Credentials credentials = settings.getCredentialsProvider().getCredentials();
+    this.stub = settings.createStub();
+  }
 
-    ClientContext clientContext =
-        ClientContext.newBuilder()
-            .setExecutor(this.executor)
-            .setChannel(this.channel)
-            .setCredentials(credentials)
-            .build();
-
-    this.listLogMetricsCallable =
-        UnaryCallable.create(settings.listLogMetricsSettings(), clientContext);
-    this.listLogMetricsPagedCallable =
-        UnaryCallable.createPagedVariant(settings.listLogMetricsSettings(), clientContext);
-    this.getLogMetricCallable =
-        UnaryCallable.create(settings.getLogMetricSettings(), clientContext);
-    this.createLogMetricCallable =
-        UnaryCallable.create(settings.createLogMetricSettings(), clientContext);
-    this.updateLogMetricCallable =
-        UnaryCallable.create(settings.updateLogMetricSettings(), clientContext);
-    this.deleteLogMetricCallable =
-        UnaryCallable.create(settings.deleteLogMetricSettings(), clientContext);
-
-    if (settings.getChannelProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              channel.shutdown();
-            }
-          });
-    }
-    if (settings.getExecutorProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              executor.shutdown();
-            }
-          });
-    }
+  protected MetricsClient(MetricsServiceV2Stub stub) {
+    this.settings = null;
+    this.stub = stub;
   }
 
   public final MetricsSettings getSettings() {
     return settings;
+  }
+
+  public MetricsServiceV2Stub getStub() {
+    return stub;
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -249,7 +207,7 @@ public class MetricsClient implements AutoCloseable {
    */
   public final UnaryCallable<ListLogMetricsRequest, ListLogMetricsPagedResponse>
       listLogMetricsPagedCallable() {
-    return listLogMetricsPagedCallable;
+    return stub.listLogMetricsPagedCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -281,7 +239,7 @@ public class MetricsClient implements AutoCloseable {
    */
   public final UnaryCallable<ListLogMetricsRequest, ListLogMetricsResponse>
       listLogMetricsCallable() {
-    return listLogMetricsCallable;
+    return stub.listLogMetricsCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -350,7 +308,7 @@ public class MetricsClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<GetLogMetricRequest, LogMetric> getLogMetricCallable() {
-    return getLogMetricCallable;
+    return stub.getLogMetricCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -429,7 +387,7 @@ public class MetricsClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<CreateLogMetricRequest, LogMetric> createLogMetricCallable() {
-    return createLogMetricCallable;
+    return stub.createLogMetricCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -510,7 +468,7 @@ public class MetricsClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<UpdateLogMetricRequest, LogMetric> updateLogMetricCallable() {
-    return updateLogMetricCallable;
+    return stub.updateLogMetricCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -579,7 +537,7 @@ public class MetricsClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<DeleteLogMetricRequest, Empty> deleteLogMetricCallable() {
-    return deleteLogMetricCallable;
+    return stub.deleteLogMetricCallable();
   }
 
   /**
@@ -588,8 +546,6 @@ public class MetricsClient implements AutoCloseable {
    */
   @Override
   public final void close() throws Exception {
-    for (AutoCloseable closeable : closeables) {
-      closeable.close();
-    }
+    stub.close();
   }
 }

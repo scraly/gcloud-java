@@ -15,19 +15,14 @@
  */
 package com.google.cloud.errorreporting.v1beta1;
 
-import com.google.api.gax.grpc.ChannelAndExecutor;
-import com.google.api.gax.grpc.UnaryCallable;
+import com.google.api.core.BetaApi;
+import com.google.api.gax.rpc.UnaryCallable;
+import com.google.cloud.errorreporting.v1beta1.stub.ErrorGroupServiceStub;
 import com.google.devtools.clouderrorreporting.v1beta1.ErrorGroup;
 import com.google.devtools.clouderrorreporting.v1beta1.GetGroupRequest;
 import com.google.devtools.clouderrorreporting.v1beta1.GroupName;
 import com.google.devtools.clouderrorreporting.v1beta1.UpdateGroupRequest;
-import com.google.protobuf.ExperimentalApi;
-import io.grpc.ManagedChannel;
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Generated;
 
 // AUTO-GENERATED DOCUMENTATION AND SERVICE
@@ -75,27 +70,20 @@ import javax.annotation.Generated;
  *
  * <pre>
  * <code>
- * InstantiatingChannelProvider channelProvider =
- *     ErrorGroupServiceSettings.defaultChannelProviderBuilder()
+ * ErrorGroupServiceSettings errorGroupServiceSettings =
+ *     ErrorGroupServiceSettings.defaultBuilder()
  *         .setCredentialsProvider(FixedCredentialsProvider.create(myCredentials))
  *         .build();
- * ErrorGroupServiceSettings errorGroupServiceSettings =
- *     ErrorGroupServiceSettings.defaultBuilder().setChannelProvider(channelProvider).build();
  * ErrorGroupServiceClient errorGroupServiceClient =
  *     ErrorGroupServiceClient.create(errorGroupServiceSettings);
  * </code>
  * </pre>
  */
-@Generated("by GAPIC")
-@ExperimentalApi
+@Generated("by GAPIC v0.0.5")
+@BetaApi
 public class ErrorGroupServiceClient implements AutoCloseable {
   private final ErrorGroupServiceSettings settings;
-  private final ScheduledExecutorService executor;
-  private final ManagedChannel channel;
-  private final List<AutoCloseable> closeables = new ArrayList<>();
-
-  private final UnaryCallable<GetGroupRequest, ErrorGroup> getGroupCallable;
-  private final UnaryCallable<UpdateGroupRequest, ErrorGroup> updateGroupCallable;
+  private final ErrorGroupServiceStub stub;
 
   /** Constructs an instance of ErrorGroupServiceClient with default settings. */
   public static final ErrorGroupServiceClient create() throws IOException {
@@ -112,43 +100,34 @@ public class ErrorGroupServiceClient implements AutoCloseable {
   }
 
   /**
+   * Constructs an instance of ErrorGroupServiceClient, using the given stub for making calls. This
+   * is for advanced usage - prefer to use ErrorGroupServiceSettings}.
+   */
+  public static final ErrorGroupServiceClient create(ErrorGroupServiceStub stub) {
+    return new ErrorGroupServiceClient(stub);
+  }
+
+  /**
    * Constructs an instance of ErrorGroupServiceClient, using the given settings. This is protected
    * so that it easy to make a subclass, but otherwise, the static factory methods should be
    * preferred.
    */
   protected ErrorGroupServiceClient(ErrorGroupServiceSettings settings) throws IOException {
     this.settings = settings;
-    ChannelAndExecutor channelAndExecutor = settings.getChannelAndExecutor();
-    this.executor = channelAndExecutor.getExecutor();
-    this.channel = channelAndExecutor.getChannel();
+    this.stub = settings.createStub();
+  }
 
-    this.getGroupCallable =
-        UnaryCallable.create(settings.getGroupSettings(), this.channel, this.executor);
-    this.updateGroupCallable =
-        UnaryCallable.create(settings.updateGroupSettings(), this.channel, this.executor);
-
-    if (settings.getChannelProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              channel.shutdown();
-            }
-          });
-    }
-    if (settings.getExecutorProvider().shouldAutoClose()) {
-      closeables.add(
-          new Closeable() {
-            @Override
-            public void close() throws IOException {
-              executor.shutdown();
-            }
-          });
-    }
+  protected ErrorGroupServiceClient(ErrorGroupServiceStub stub) {
+    this.settings = null;
+    this.stub = stub;
   }
 
   public final ErrorGroupServiceSettings getSettings() {
     return settings;
+  }
+
+  public ErrorGroupServiceStub getStub() {
+    return stub;
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -221,7 +200,7 @@ public class ErrorGroupServiceClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<GetGroupRequest, ErrorGroup> getGroupCallable() {
-    return getGroupCallable;
+    return stub.getGroupCallable();
   }
 
   // AUTO-GENERATED DOCUMENTATION AND METHOD
@@ -288,7 +267,7 @@ public class ErrorGroupServiceClient implements AutoCloseable {
    * </code></pre>
    */
   public final UnaryCallable<UpdateGroupRequest, ErrorGroup> updateGroupCallable() {
-    return updateGroupCallable;
+    return stub.updateGroupCallable();
   }
 
   /**
@@ -297,8 +276,6 @@ public class ErrorGroupServiceClient implements AutoCloseable {
    */
   @Override
   public final void close() throws Exception {
-    for (AutoCloseable closeable : closeables) {
-      closeable.close();
-    }
+    stub.close();
   }
 }

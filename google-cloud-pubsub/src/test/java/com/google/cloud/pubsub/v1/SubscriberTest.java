@@ -20,9 +20,9 @@ import static com.google.cloud.pubsub.v1.MessageDispatcher.PENDING_ACKS_SEND_DEL
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.google.api.gax.core.FixedExecutorProvider;
+import com.google.api.gax.core.InstantiatingExecutorProvider;
 import com.google.api.gax.grpc.FixedChannelProvider;
-import com.google.api.gax.grpc.FixedExecutorProvider;
-import com.google.api.gax.grpc.InstantiatingExecutorProvider;
 import com.google.cloud.pubsub.v1.FakeSubscriberServiceImpl.ModifyAckDeadline;
 import com.google.cloud.pubsub.v1.Subscriber.Builder;
 import com.google.common.base.Function;
@@ -47,7 +47,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
-import org.threeten.bp.Duration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,6 +55,7 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.threeten.bp.Duration;
 
 /** Tests for {@link Subscriber}. */
 @RunWith(Parameterized.class)
